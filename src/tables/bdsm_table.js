@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table } from "antd";
+import { Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
 import axios from "axios";
-import { render } from "@testing-library/react";
 
 const strList = [
   "동의",
@@ -15,6 +14,45 @@ const strList = [
 const BDSMTable = () => {
   const [dataSource, setDataSource] = useState([]);
   const [expandDataSource, setExpandDataSource] = useState({}); // 객체로 초기화
+
+  const [form] = Form.useForm();
+  const [editingKey, setEditingKey] = useState("");
+  const isEditing = (record) => record.key === editingKey;
+
+  const edit = (record) => {
+    form.setFieldsValue({
+      name: "",
+      age: "",
+      address: "",
+      ...record,
+    });
+    setEditingKey(record.key);
+  };
+  const cancel = () => {
+    setEditingKey("");
+  };
+  const save = async (key) => {
+    try {
+      const row = await form.validateFields();
+      const newData = [...dataSource];
+      const index = newData.findIndex((item) => key === item.key);
+      if (index > -1) {
+        const item = newData[index];
+        newData.splice(index, 1, {
+          ...item,
+          ...row,
+        });
+        setDataSource(newData);
+        setEditingKey("");
+      } else {
+        newData.push(row);
+        setDataSource(newData);
+        setEditingKey("");
+      }
+    } catch (errInfo) {
+      console.log("Validate Failed:", errInfo);
+    }
+  };
 
   useEffect(() => {
     // Fetch questions data using Axios
@@ -51,7 +89,7 @@ const BDSMTable = () => {
         setExpandDataSource((prev) => ({
           ...prev,
           [record.key]: answers.map((value, index) => ({
-            key: index + 1,
+            key: `answer-${index}`,
             answer: value.step,
             ...value,
           })),
@@ -75,10 +113,69 @@ const BDSMTable = () => {
       title: "Question",
       dataIndex: "question",
       key: "question",
+      editable: true,
+    },
+    {
+      title: "operation",
+      dataIndex: "operation",
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <span>
+            <Typography.Link
+              onClick={() => save(record.key)}
+              style={{
+                marginInlineEnd: 8,
+              }}
+            >
+              저장
+            </Typography.Link>
+            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+              <a>취소</a>
+            </Popconfirm>
+          </span>
+        ) : (
+          <Typography.Link
+            disabled={editingKey !== ""}
+            onClick={() => edit(record)}
+          >
+            수정
+          </Typography.Link>
+        );
+      },
     },
   ];
 
   const expandColumns = [
+    {
+      title: "operation",
+      dataIndex: "operation",
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <span>
+            <Typography.Link
+              onClick={() => save(record.key)}
+              style={{
+                marginInlineEnd: 8,
+              }}
+            >
+              저장
+            </Typography.Link>
+            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+              <a>취소</a>
+            </Popconfirm>
+          </span>
+        ) : (
+          <Typography.Link
+            disabled={editingKey !== ""}
+            onClick={() => edit(record)}
+          >
+            수정
+          </Typography.Link>
+        );
+      },
+    },
     {
       title: "Answer",
       dataIndex: "answer",
@@ -96,6 +193,7 @@ const BDSMTable = () => {
       dataIndex: "master_mistress_",
       key: "master_mistress_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -106,6 +204,7 @@ const BDSMTable = () => {
       dataIndex: "slave_",
       key: "slave_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -116,6 +215,7 @@ const BDSMTable = () => {
       dataIndex: "hunter_",
       key: "hunter_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -126,6 +226,7 @@ const BDSMTable = () => {
       dataIndex: "prey_",
       key: "prey_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -136,6 +237,7 @@ const BDSMTable = () => {
       dataIndex: "brat_tamer_",
       key: "brat_tamer_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -146,6 +248,7 @@ const BDSMTable = () => {
       dataIndex: "brat_",
       key: "brat_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -156,6 +259,7 @@ const BDSMTable = () => {
       dataIndex: "owner_",
       key: "owner_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -166,6 +270,7 @@ const BDSMTable = () => {
       dataIndex: "pet_",
       key: "pet_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -176,6 +281,7 @@ const BDSMTable = () => {
       dataIndex: "daddy_mommy_",
       key: "daddy_mommy_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -186,6 +292,7 @@ const BDSMTable = () => {
       dataIndex: "little_",
       key: "little_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -196,6 +303,7 @@ const BDSMTable = () => {
       dataIndex: "sadist_",
       key: "sadist_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -206,6 +314,7 @@ const BDSMTable = () => {
       dataIndex: "masochist_",
       key: "masochist_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -216,6 +325,7 @@ const BDSMTable = () => {
       dataIndex: "spanker_",
       key: "spanker_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -226,6 +336,7 @@ const BDSMTable = () => {
       dataIndex: "spankee_",
       key: "spankee_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -236,6 +347,7 @@ const BDSMTable = () => {
       dataIndex: "degrader_",
       key: "degrader_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -246,6 +358,7 @@ const BDSMTable = () => {
       dataIndex: "degradee_",
       key: "degradee_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -256,6 +369,7 @@ const BDSMTable = () => {
       dataIndex: "rigger_",
       key: "rigger_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -266,6 +380,7 @@ const BDSMTable = () => {
       dataIndex: "rope_bunny_",
       key: "rope_bunny_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -276,6 +391,7 @@ const BDSMTable = () => {
       dataIndex: "dominant_",
       key: "dominant_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -286,6 +402,7 @@ const BDSMTable = () => {
       dataIndex: "submissive_",
       key: "submissive_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -296,6 +413,7 @@ const BDSMTable = () => {
       dataIndex: "switch_",
       key: "switch_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
     {
       title: (
@@ -306,34 +424,128 @@ const BDSMTable = () => {
       dataIndex: "vanilla_",
       key: "vanilla_",
       render: (text) => <span>{text === 0 ? "" : text}</span>,
+      editable: true,
     },
   ];
+
+  const mergedColumns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        inputType: "string",
+        dataIndex: col.dataIndex,
+        title: col.title,
+        editing: isEditing(record),
+      }),
+    };
+  });
+
+  const mergedExpandColumns = expandColumns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        inputType: "number",
+        dataIndex: col.dataIndex,
+        title: col.title,
+        editing: isEditing(record),
+      }),
+    };
+  });
 
   const expandedRowRender = (record) => (
     <div style={{ overflowX: "auto", maxWidth: "100%" }}>
       <Table
-        columns={expandColumns}
+        columns={mergedExpandColumns}
         dataSource={expandDataSource[record.key] || []} // 배열이 없으면 빈 배열
-        pagination={false} // 하위 테이블에 페이지네이션 없음
         scroll={{ x: "max-content" }} // 하위 테이블에만 가로 스크롤 적용
         style={{ width: "100%" }} // 하위 테이블의 width 설정
         size="small"
+        pagination={{
+          onChange: cancel,
+        }}
+        components={{
+          body: {
+            cell: EditableCell,
+          },
+        }}
       />
     </div>
   );
 
   return (
-    <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-      <Table
-        columns={columns}
-        expandable={{
-          expandedRowRender,
-          onExpand: handleExpand,
-        }}
-        dataSource={dataSource}
-        scroll={{ x: "max-content" }} // 부모 테이블에 스크롤 적용 안함 (필요시 추가 가능)
-      />
-    </div>
+    <Form form={form} component={false}>
+      <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+        <Table
+          columns={mergedColumns}
+          expandable={{
+            expandedRowRender,
+            onExpand: handleExpand,
+          }}
+          dataSource={dataSource}
+          scroll={{ x: "max-content" }} // 부모 테이블에 스크롤 적용 안함 (필요시 추가 가능)
+          pagination={{
+            onChange: cancel,
+          }}
+          components={{
+            body: {
+              cell: EditableCell,
+            },
+          }}
+        />
+      </div>
+    </Form>
+  );
+};
+
+const EditableCell = ({
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  record,
+  index,
+  children,
+  ...restProps
+}) => {
+  const inputNode =
+    inputType === "number" ? (
+      <InputNumber style={{ width: "56px" }} />
+    ) : (
+      <Input />
+    );
+
+  useEffect(() => {
+    console.log(editing);
+  }, [editing]);
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item
+          name={dataIndex}
+          style={{
+            margin: 0,
+          }}
+          rules={[
+            {
+              required: true,
+              message: `Please Input ${title}!`,
+            },
+          ]}
+        >
+          {inputNode}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
   );
 };
 
