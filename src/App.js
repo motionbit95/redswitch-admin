@@ -23,7 +23,7 @@ const App = () => {
   return (
     <Layout>
       {/* 상단 헤더 */}
-      <Header style={{ position: "fixed", zIndex: 1, width: "100%" }}>
+      <Header style={{ position: "fixed", zIndex: 999, width: "100%" }}>
         <div
           style={{
             float: "left",

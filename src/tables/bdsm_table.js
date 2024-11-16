@@ -126,6 +126,8 @@ const BDSMTable = () => {
         setEditingKey("");
       }
 
+      console.log(newData[index]);
+
       // Now send the updated answer data to the server
       axios
         .put(`http://localhost:8080/bdsm/update-answer`, newData[index]) // Send the specific answer data
@@ -202,6 +204,8 @@ const BDSMTable = () => {
       editable: true,
     },
     {
+      width: "100px",
+      fixed: "right",
       title: "동작",
       dataIndex: "operation",
       render: (_, record) => {
@@ -216,7 +220,12 @@ const BDSMTable = () => {
             >
               저장
             </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+            <Popconfirm
+              title="변경을 취소하시겠습니까?"
+              onConfirm={cancel}
+              cancelText="취소"
+              okText="확인"
+            >
               <a>취소</a>
             </Popconfirm>
           </span>
@@ -234,7 +243,48 @@ const BDSMTable = () => {
 
   const expandColumns = [
     {
-      title: "Answer",
+      width: "100px",
+      fixed: "left",
+      title: "동작",
+      dataIndex: "operation",
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <span>
+            <Typography.Link
+              onClick={() => saveAnswer(record.question_pk, record.key)}
+              style={{
+                marginInlineEnd: 8,
+              }}
+            >
+              저장
+            </Typography.Link>
+            <Popconfirm
+              title="변경을 취소하시겠습니까?"
+              onConfirm={cancel}
+              cancelText="취소"
+              okText="확인"
+            >
+              <a>취소</a>
+            </Popconfirm>
+          </span>
+        ) : (
+          <Typography.Link
+            disabled={editingKey !== ""}
+            onClick={() => editAnswer(record)}
+          >
+            수정
+          </Typography.Link>
+        );
+      },
+    },
+    {
+      title: "index",
+      dataIndex: "index",
+      key: "index",
+    },
+    {
+      title: "답변",
       dataIndex: "answer",
       key: "answer",
       render: (text) => <span>{strList[text - 1]}</span>,
@@ -483,35 +533,6 @@ const BDSMTable = () => {
       render: (text) => <span>{text === 0 ? "" : text}</span>,
       editable: true,
     },
-    {
-      title: "동작",
-      dataIndex: "operation",
-      render: (_, record) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <Typography.Link
-              onClick={() => saveAnswer(record.question_pk, record.key)}
-              style={{
-                marginInlineEnd: 8,
-              }}
-            >
-              저장
-            </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>취소</a>
-            </Popconfirm>
-          </span>
-        ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => editAnswer(record)}
-          >
-            수정
-          </Typography.Link>
-        );
-      },
-    },
   ];
 
   const mergedColumns = columns.map((col) => {
@@ -581,6 +602,7 @@ const BDSMTable = () => {
       </div>
       <div style={{ overflowX: "auto", maxWidth: "100%" }}>
         <Table
+          size="small"
           columns={mergedColumns}
           expandable={{
             expandedRowRender,
