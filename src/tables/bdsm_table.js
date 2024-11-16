@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Popconfirm,
+  Table,
+  Typography,
+} from "antd";
 import axios from "axios";
+import { AxiosPut } from "../api";
 
 const strList = [
   "동의",
@@ -19,19 +28,43 @@ const BDSMTable = () => {
   const [editingKey, setEditingKey] = useState("");
   const isEditing = (record) => record.key === editingKey;
 
-  const edit = (record) => {
+  const addQuestion = () => {
+    axios
+      .post("http://localhost:8080/bdsm/add-question", {
+        question: "",
+      })
+      .then((response) => {
+        console.log("Question added:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error adding question:", error);
+      });
+
+    const newData = {
+      key: dataSource.length + 1,
+      question: "",
+    };
+    setDataSource([...dataSource, newData]);
+  };
+
+  const editQuestion = (record) => {
     form.setFieldsValue({
-      name: "",
-      age: "",
-      address: "",
       ...record,
     });
     setEditingKey(record.key);
   };
+
+  const editAnswer = (record) => {
+    form.setFieldsValue({
+      ...record,
+    });
+    setEditingKey(record.key);
+  };
+
   const cancel = () => {
     setEditingKey("");
   };
-  const save = async (key) => {
+  const saveQuestion = async (key) => {
     try {
       const row = await form.validateFields();
       const newData = [...dataSource];
@@ -49,6 +82,59 @@ const BDSMTable = () => {
         setDataSource(newData);
         setEditingKey("");
       }
+
+      console.log({ ...row, question_pk: key });
+      AxiosPut(`http://localhost:8080/bdsm/update-question`, {
+        ...row,
+        question_pk: key,
+      })
+        .then((response) => {
+          console.log("Question updated:", response.data);
+        })
+        .catch((error) => {
+          console.error("Error updating question:", error);
+        });
+    } catch (errInfo) {
+      console.log("Validate Failed:", errInfo);
+    }
+  };
+
+  const saveAnswer = async (question_pk, key) => {
+    try {
+      const row = await form.validateFields(); // Validate form fields before saving
+      const newData = [...expandDataSource[question_pk]]; // Clone the existing answers
+
+      const index = newData.findIndex((item) => key === item.key);
+      if (index > -1) {
+        const item = newData[index];
+        newData.splice(index, 1, {
+          ...item,
+          ...row, // Merge new form data into the existing item
+        });
+        // Update the state with new answers
+        setExpandDataSource((prev) => ({
+          ...prev,
+          [question_pk]: newData,
+        }));
+        setEditingKey("");
+      } else {
+        newData.push(row); // Add new answer if not found
+        setExpandDataSource((prev) => ({
+          ...prev,
+          [question_pk]: newData,
+        }));
+        setEditingKey("");
+      }
+
+      // Now send the updated answer data to the server
+      axios
+        .put(`http://localhost:8080/bdsm/update-answer`, newData[index]) // Send the specific answer data
+        .then((response) => {
+          console.log("Answer updated successfully:", response);
+        })
+        .catch((error) => {
+          console.error("Error updating answer:", error);
+        });
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
     }
@@ -110,20 +196,20 @@ const BDSMTable = () => {
       key: "key",
     },
     {
-      title: "Question",
+      title: "질문",
       dataIndex: "question",
       key: "question",
       editable: true,
     },
     {
-      title: "operation",
+      title: "동작",
       dataIndex: "operation",
       render: (_, record) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
             <Typography.Link
-              onClick={() => save(record.key)}
+              onClick={() => saveQuestion(record.key)}
               style={{
                 marginInlineEnd: 8,
               }}
@@ -137,7 +223,7 @@ const BDSMTable = () => {
         ) : (
           <Typography.Link
             disabled={editingKey !== ""}
-            onClick={() => edit(record)}
+            onClick={() => editQuestion(record)}
           >
             수정
           </Typography.Link>
@@ -147,35 +233,6 @@ const BDSMTable = () => {
   ];
 
   const expandColumns = [
-    {
-      title: "operation",
-      dataIndex: "operation",
-      render: (_, record) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <Typography.Link
-              onClick={() => save(record.key)}
-              style={{
-                marginInlineEnd: 8,
-              }}
-            >
-              저장
-            </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>취소</a>
-            </Popconfirm>
-          </span>
-        ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => edit(record)}
-          >
-            수정
-          </Typography.Link>
-        );
-      },
-    },
     {
       title: "Answer",
       dataIndex: "answer",
@@ -426,6 +483,35 @@ const BDSMTable = () => {
       render: (text) => <span>{text === 0 ? "" : text}</span>,
       editable: true,
     },
+    {
+      title: "동작",
+      dataIndex: "operation",
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <span>
+            <Typography.Link
+              onClick={() => saveAnswer(record.question_pk, record.key)}
+              style={{
+                marginInlineEnd: 8,
+              }}
+            >
+              저장
+            </Typography.Link>
+            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+              <a>취소</a>
+            </Popconfirm>
+          </span>
+        ) : (
+          <Typography.Link
+            disabled={editingKey !== ""}
+            onClick={() => editAnswer(record)}
+          >
+            수정
+          </Typography.Link>
+        );
+      },
+    },
   ];
 
   const mergedColumns = columns.map((col) => {
@@ -460,28 +546,39 @@ const BDSMTable = () => {
     };
   });
 
-  const expandedRowRender = (record) => (
-    <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-      <Table
-        columns={mergedExpandColumns}
-        dataSource={expandDataSource[record.key] || []} // 배열이 없으면 빈 배열
-        scroll={{ x: "max-content" }} // 하위 테이블에만 가로 스크롤 적용
-        style={{ width: "100%" }} // 하위 테이블의 width 설정
-        size="small"
-        pagination={{
-          onChange: cancel,
-        }}
-        components={{
-          body: {
-            cell: EditableCell,
-          },
-        }}
-      />
-    </div>
-  );
+  const expandedRowRender = (record) => {
+    return (
+      <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+        <Table
+          columns={mergedExpandColumns}
+          dataSource={expandDataSource[record.key] || []} // 배열이 없으면 빈 배열
+          scroll={{ x: "max-content" }} // 하위 테이블에만 가로 스크롤 적용
+          style={{ width: "100%" }} // 하위 테이블의 width 설정
+          size="small"
+          pagination={false}
+          components={{
+            body: {
+              cell: EditableCell,
+            },
+          }}
+        />
+      </div>
+    );
+  };
 
   return (
     <Form form={form} component={false}>
+      <div
+        style={{
+          paddingBottom: "10px",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
+        <Button type="primary" onClick={addQuestion}>
+          질문추가
+        </Button>
+      </div>
       <div style={{ overflowX: "auto", maxWidth: "100%" }}>
         <Table
           columns={mergedColumns}
@@ -522,9 +619,6 @@ const EditableCell = ({
       <Input />
     );
 
-  useEffect(() => {
-    console.log(editing);
-  }, [editing]);
   return (
     <td {...restProps}>
       {editing ? (
@@ -533,12 +627,6 @@ const EditableCell = ({
           style={{
             margin: 0,
           }}
-          rules={[
-            {
-              required: true,
-              message: `Please Input ${title}!`,
-            },
-          ]}
         >
           {inputNode}
         </Form.Item>

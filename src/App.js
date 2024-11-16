@@ -11,80 +11,67 @@ import {
 } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
 import BDSM from "./pages/bdsm";
-const { Header, Content, Footer, Sider } = Layout;
-const siderStyle = {
-  overflow: "auto",
-  height: "100vh",
-  position: "fixed",
-  insetInlineStart: 0,
-  top: 0,
-  bottom: 0,
-  scrollbarWidth: "thin",
-  scrollbarGutter: "stable",
-};
-const items = [
-  UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-  BarChartOutlined,
-  CloudOutlined,
-  AppstoreOutlined,
-  TeamOutlined,
-  ShopOutlined,
-].map((icon, index) => ({
-  key: String(index + 1),
-  icon: React.createElement(icon),
-  label: `nav ${index + 1}`,
-}));
+import SubMenu from "antd/es/menu/SubMenu";
+
+const { Header, Content, Footer } = Layout;
+
 const App = () => {
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgContainer },
   } = theme.useToken();
+
   return (
-    <Layout hasSider>
-      <Sider style={siderStyle}>
-        <div className="demo-logo-vertical" />
+    <Layout>
+      {/* 상단 헤더 */}
+      <Header style={{ position: "fixed", zIndex: 1, width: "100%" }}>
+        <div
+          style={{
+            float: "left",
+            color: "#fff",
+            fontSize: "20px",
+            fontWeight: "bold",
+          }}
+        >
+          Redswitch
+        </div>
         <Menu
           theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["4"]}
-          items={items}
-        />
-      </Sider>
-      <Layout
+          mode="horizontal"
+          style={{ justifyContent: "flex-end" }}
+        >
+          <Menu.Item key="1">Home</Menu.Item>
+          <Menu.Item key="2">About</Menu.Item>
+          <SubMenu key="submenu" title="Services">
+            <Menu.Item key="3">Service 1</Menu.Item>
+            <Menu.Item key="4">Service 2</Menu.Item>
+            <Menu.Item key="5">Service 3</Menu.Item>
+          </SubMenu>
+          <Menu.Item key="6">Contact</Menu.Item>
+        </Menu>
+      </Header>
+
+      {/* 메인 콘텐츠 */}
+      <Content
         style={{
-          marginInlineStart: 200,
+          marginTop: 64, // 헤더의 높이와 동일하게 설정
+          padding: "24px",
+          background: colorBgContainer,
+          minHeight: "calc(100vh - 128px)", // 전체 높이에서 헤더와 푸터 제외
         }}
       >
-        {/* <Header
-          style={{
-            position: "fixed",
-            zIndex: 1,
-            width: "calc(100% - 200px)",
-            insetInlineStart: 200,
-            padding: 0,
-            background: colorBgContainer,
-          }}
-        /> */}
-        <Content
-          style={{
-            overflow: "initial",
-            height: "100vh",
-            padding: "24px",
-            position: "relative",
-          }}
-        >
-          <BDSM />
-        </Content>
-        <Footer
-          style={{
-            textAlign: "center",
-          }}
-        >
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
-        </Footer>
-      </Layout>
+        <BDSM />
+      </Content>
+
+      {/* 하단 푸터 */}
+      <Footer
+        style={{
+          textAlign: "center",
+        }}
+      >
+        Ant Design ©{new Date().getFullYear()} Created by Ant UED
+      </Footer>
     </Layout>
   );
 };
+
 export default App;
