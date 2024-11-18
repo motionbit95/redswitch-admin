@@ -12,6 +12,7 @@ import {
 import { Layout, Menu, theme } from "antd";
 import BDSM from "./pages/bdsm";
 import SubMenu from "antd/es/menu/SubMenu";
+import BDSMResult from "./pages/bdsm_result";
 
 const { Header, Content, Footer } = Layout;
 
@@ -59,7 +60,8 @@ const App = () => {
           minHeight: "calc(100vh - 128px)", // 전체 높이에서 헤더와 푸터 제외
         }}
       >
-        <BDSM />
+        {/* <BDSM /> */}
+        <BDSMResult />
       </Content>
 
       {/* 하단 푸터 */}

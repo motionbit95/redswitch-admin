@@ -571,6 +571,7 @@ const BDSMTable = () => {
     return (
       <div style={{ overflowX: "auto", maxWidth: "100%" }}>
         <Table
+          size="small"
           columns={mergedExpandColumns}
           dataSource={expandDataSource[record.key] || []} // 배열이 없으면 빈 배열
           scroll={{ x: "max-content" }} // 하위 테이블에만 가로 스크롤 적용
@@ -601,6 +602,7 @@ const BDSMTable = () => {
       </div>
       <div style={{ overflowX: "auto", maxWidth: "100%" }}>
         <Table
+          size="small"
           columns={mergedColumns}
           expandable={{
             expandedRowRender,
