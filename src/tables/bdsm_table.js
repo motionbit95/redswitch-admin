@@ -30,7 +30,7 @@ const BDSMTable = () => {
 
   const addQuestion = () => {
     axios
-      .post("http://localhost:8080/bdsm/add-question", {
+      .post("http://localhost:8080/bdsm/questions", {
         question: "",
       })
       .then((response) => {
@@ -84,7 +84,7 @@ const BDSMTable = () => {
       }
 
       console.log({ ...row, question_pk: key });
-      AxiosPut(`http://localhost:8080/bdsm/update-question`, {
+      AxiosPut(`http://localhost:8080/bdsm/questions`, {
         ...row,
         question_pk: key,
       })
@@ -130,7 +130,7 @@ const BDSMTable = () => {
 
       // Now send the updated answer data to the server
       axios
-        .put(`http://localhost:8080/bdsm/update-answer`, newData[index]) // Send the specific answer data
+        .put(`http://localhost:8080/bdsm/answers`, newData[index]) // Send the specific answer data
         .then((response) => {
           console.log("Answer updated successfully:", response);
         })
@@ -147,7 +147,7 @@ const BDSMTable = () => {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/bdsm/list-all-questions"
+          "http://localhost:8080/bdsm/questions"
         );
         const questions = response.data;
         console.log(questions);
@@ -169,7 +169,7 @@ const BDSMTable = () => {
     if (expanded) {
       try {
         const response = await axios.get(
-          `http://localhost:8080/bdsm/get-answers/${record.key}`
+          `http://localhost:8080/bdsm/answers/${record.key}`
         );
         const answers = response.data;
         console.log(answers);

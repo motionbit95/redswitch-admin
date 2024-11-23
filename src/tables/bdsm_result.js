@@ -14,9 +14,7 @@ const BDSMResultTable = () => {
     const fetchData = async () => {
       try {
         // Make the API call to fetch the list of all results
-        const response = await AxiosGet(
-          "http://localhost:8080/bdsm/list-all-results"
-        );
+        const response = await AxiosGet("http://localhost:8080/bdsm/results");
         setData(response.data); // Update the state with the fetched data
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -49,7 +47,7 @@ const BDSMResultTable = () => {
 
       // Call the API endpoint to update the record on the server
       await AxiosPut(
-        `http://localhost:8080/bdsm/result-update/${updatedRecord.key}`,
+        `http://localhost:8080/bdsm/results/${updatedRecord.key}`,
         updatedRecord
       );
 
