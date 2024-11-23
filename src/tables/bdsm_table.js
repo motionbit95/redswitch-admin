@@ -28,23 +28,23 @@ const BDSMTable = () => {
   const [editingKey, setEditingKey] = useState("");
   const isEditing = (record) => record.key === editingKey;
 
-  const addQuestion = () => {
+  const addQuestion = async () => {
     axios
       .post("http://localhost:8080/bdsm/questions", {
         question: "",
       })
       .then((response) => {
         console.log("Question added:", response.data);
+
+        const newData = {
+          key: dataSource.length + 1,
+          question: "",
+        };
+        setDataSource([...dataSource, newData]);
       })
       .catch((error) => {
         console.error("Error adding question:", error);
       });
-
-    const newData = {
-      key: dataSource.length + 1,
-      question: "",
-    };
-    setDataSource([...dataSource, newData]);
   };
 
   const editQuestion = (record) => {
@@ -582,6 +582,7 @@ const BDSMTable = () => {
               cell: EditableCell,
             },
           }}
+          size="small"
         />
       </div>
     );
@@ -636,7 +637,7 @@ const EditableCell = ({
 }) => {
   const inputNode =
     inputType === "number" ? (
-      <InputNumber style={{ width: "56px" }} />
+      <InputNumber style={{ width: "36px" }} />
     ) : (
       <Input />
     );
