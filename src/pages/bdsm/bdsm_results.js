@@ -177,7 +177,7 @@ const BDSMResults = () => {
       </div>
       <Table
         pagination={{
-          defaultPageSize: 20,
+          defaultPageSize: 10,
           showSizeChanger: true,
         }}
         size="small"

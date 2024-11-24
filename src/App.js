@@ -76,7 +76,7 @@ const App = () => {
 
   return (
     <Router>
-      <Layout style={{ minHeight: "100vh" }}>
+      <Layout style={{ minHeight: "100vh", minWidth: "1200px" }}>
         <Header
           style={{
             display: "flex",

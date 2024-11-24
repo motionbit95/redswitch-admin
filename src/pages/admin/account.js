@@ -138,16 +138,15 @@ const Account = () => {
     {
       title: "동작",
       key: "actions",
+
       render: (text, record) => (
-        <Space size="middle">
-          <Button onClick={() => handleEdit(record)} type="primary">
-            수정
-          </Button>
+        <Space>
+          <a onClick={() => handleEdit(record)}>수정</a>
           <Popconfirm
             title="계정을 삭제하시겠습니까?"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button danger>삭제</Button>
+            <a>삭제</a>
           </Popconfirm>
         </Space>
       ),
@@ -155,7 +154,7 @@ const Account = () => {
   ];
 
   return (
-    <div>
+    <div style={{ textAlign: "right" }}>
       <Button
         type="primary"
         style={{ marginBottom: 16 }}

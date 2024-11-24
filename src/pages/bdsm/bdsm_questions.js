@@ -634,7 +634,7 @@ const BDSMQuestions = () => {
           scroll={{ x: "max-content" }} // 부모 테이블에 스크롤 적용 안함 (필요시 추가 가능)
           pagination={{
             defaultCurrent: 1,
-            defaultPageSize: 20,
+            defaultPageSize: 10,
             showSizeChanger: true,
             onChange: cancel,
           }}
