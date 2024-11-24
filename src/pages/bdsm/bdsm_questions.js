@@ -5,11 +5,15 @@ import {
   Input,
   InputNumber,
   Popconfirm,
+  Space,
   Table,
   Typography,
 } from "antd";
-import axios from "axios";
-import { AxiosPut } from "../api";
+import { SearchOutlined } from "@ant-design/icons";
+import { AxiosDelete, AxiosGet, AxiosPost, AxiosPut } from "../../api";
+import useSearchableColumn, {
+  getColumnSearchProps,
+} from "../../components/table";
 
 const strList = [
   "동의",
@@ -20,19 +24,19 @@ const strList = [
   "대체적으로 비동의",
   "비동의",
 ];
-const BDSMTable = () => {
+const BDSMQuestions = () => {
   const [dataSource, setDataSource] = useState([]);
   const [expandDataSource, setExpandDataSource] = useState({}); // 객체로 초기화
+  const { getColumnSearchProps } = useSearchableColumn();
 
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
   const isEditing = (record) => record.key === editingKey;
 
   const addQuestion = async () => {
-    axios
-      .post("http://localhost:8080/bdsm/questions", {
-        question: "",
-      })
+    AxiosPost("/bdsm/questions", {
+      question: "",
+    })
       .then((response) => {
         console.log("Question added:", response.data);
 
@@ -84,7 +88,7 @@ const BDSMTable = () => {
       }
 
       console.log({ ...row, question_pk: key });
-      AxiosPut(`http://localhost:8080/bdsm/questions`, {
+      AxiosPut(`/bdsm/questions`, {
         ...row,
         question_pk: key,
       })
@@ -129,8 +133,7 @@ const BDSMTable = () => {
       console.log(newData[index]);
 
       // Now send the updated answer data to the server
-      axios
-        .put(`http://localhost:8080/bdsm/answers`, newData[index]) // Send the specific answer data
+      AxiosPut(`/bdsm/answers`, newData[index]) // Send the specific answer data
         .then((response) => {
           console.log("Answer updated successfully:", response);
         })
@@ -142,13 +145,20 @@ const BDSMTable = () => {
     }
   };
 
+  const deleteQuestion = async (key) => {
+    try {
+      await AxiosDelete(`/bdsm/questions/${key}`);
+      setDataSource(dataSource.filter((item) => item.key !== key));
+    } catch (error) {
+      console.error("Error deleting question:", error);
+    }
+  };
+
   useEffect(() => {
     // Fetch questions data using Axios
     const fetchQuestions = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/bdsm/questions"
-        );
+        const response = await AxiosGet("/bdsm/questions");
         const questions = response.data;
         console.log(questions);
         setDataSource(
@@ -168,9 +178,7 @@ const BDSMTable = () => {
   const handleExpand = async (expanded, record) => {
     if (expanded) {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/bdsm/answers/${record.key}`
-        );
+        const response = await AxiosGet(`/bdsm/answers/${record.key}`);
         const answers = response.data;
         console.log(answers);
 
@@ -196,12 +204,16 @@ const BDSMTable = () => {
       title: "No.",
       dataIndex: "key",
       key: "key",
+      sorter: (a, b) => a.key - b.key, // Sorting in descending order
+      defaultSortOrder: "descend", // Initially sorted in descending order
     },
     {
       title: "질문",
       dataIndex: "question",
       key: "question",
       editable: true,
+
+      ...getColumnSearchProps("question"),
     },
     {
       width: "100px",
@@ -230,12 +242,22 @@ const BDSMTable = () => {
             </Popconfirm>
           </span>
         ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => editQuestion(record)}
-          >
-            수정
-          </Typography.Link>
+          <Space>
+            <Typography.Link
+              disabled={editingKey !== ""}
+              onClick={() => editQuestion(record)}
+            >
+              수정
+            </Typography.Link>
+            <Popconfirm
+              title="문항을 삭제하시겠습니까?"
+              onConfirm={() => deleteQuestion(record.key)}
+              cancelText="삭제"
+              okText="확인"
+            >
+              <a>삭제</a>
+            </Popconfirm>
+          </Space>
         );
       },
     },
@@ -278,11 +300,11 @@ const BDSMTable = () => {
         );
       },
     },
-    {
-      title: "index",
-      dataIndex: "index",
-      key: "index",
-    },
+    // {
+    //   title: "index",
+    //   dataIndex: "index",
+    //   key: "index",
+    // },
     {
       title: "답변",
       dataIndex: "answer",
@@ -582,7 +604,6 @@ const BDSMTable = () => {
               cell: EditableCell,
             },
           }}
-          size="small"
         />
       </div>
     );
@@ -612,6 +633,9 @@ const BDSMTable = () => {
           dataSource={dataSource}
           scroll={{ x: "max-content" }} // 부모 테이블에 스크롤 적용 안함 (필요시 추가 가능)
           pagination={{
+            defaultCurrent: 1,
+            defaultPageSize: 20,
+            showSizeChanger: true,
             onChange: cancel,
           }}
           components={{
@@ -660,4 +684,4 @@ const EditableCell = ({
   );
 };
 
-export default BDSMTable;
+export default BDSMQuestions;

@@ -1,78 +1,133 @@
-import React from "react";
-import {
-  AppstoreOutlined,
-  BarChartOutlined,
-  CloudOutlined,
-  ShopOutlined,
-  TeamOutlined,
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-} from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
-import BDSM from "./pages/bdsm";
-import SubMenu from "antd/es/menu/SubMenu";
-import BDSMResult from "./pages/bdsm_result";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { DotChartOutlined } from "@ant-design/icons";
+import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Footer } from "antd/es/layout/layout";
+import BDSMQuestions from "./pages/bdsm/bdsm_questions";
+import BDSMResults from "./pages/bdsm/bdsm_results";
 
-const { Header, Content, Footer } = Layout;
+const { Header, Content, Sider } = Layout;
+
+// 각 페이지 컴포넌트
+const BDSMAdvertise = () => <div>광고 관리 페이지</div>;
+const BDSMTrend = () => <div>통계 관리 페이지</div>;
 
 const App = () => {
   const {
-    token: { colorBgContainer },
+    token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  const defaultOpenKeys = window.location.pathname.split("/")[1];
+  const defaultSelectedKeys = window.location.pathname;
+
+  useEffect(() => {
+    console.log("App component mounted");
+    console.log(window.location.pathname.split("/")[1]);
+  }, []);
+
+  // 메뉴 항목
+  const items = [
+    {
+      key: "bdsm",
+      icon: React.createElement(DotChartOutlined),
+      label: "BDSM",
+      children: [
+        {
+          key: "/bdsm/questions",
+          label: <Link to="/bdsm/questions">문항관리</Link>,
+        },
+        {
+          key: "/bdsm/results",
+          label: <Link to="/bdsm/results">성향관리</Link>,
+        },
+        {
+          key: "/bdsm/advertise",
+          label: <Link to="/bdsm/advertise">광고관리</Link>,
+        },
+        {
+          key: "/bdsm/trend",
+          label: <Link to="/bdsm/trend">통계관리</Link>,
+        },
+      ],
+    },
+  ];
+
   return (
-    <Layout>
-      {/* 상단 헤더 */}
-      <Header style={{ position: "fixed", zIndex: 999, width: "100%" }}>
-        <div
+    <Router>
+      <Layout style={{ minHeight: "100vh" }}>
+        <Header
           style={{
-            float: "left",
-            color: "#fff",
-            fontSize: "20px",
-            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          Redswitch
-        </div>
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          style={{ justifyContent: "flex-end" }}
-        >
-          <Menu.Item key="1">Home</Menu.Item>
-          <Menu.Item key="2">About</Menu.Item>
-          <SubMenu key="submenu" title="Services">
-            <Menu.Item key="3">Service 1</Menu.Item>
-            <Menu.Item key="4">Service 2</Menu.Item>
-            <Menu.Item key="5">Service 3</Menu.Item>
-          </SubMenu>
-          <Menu.Item key="6">Contact</Menu.Item>
-        </Menu>
-      </Header>
-
-      {/* 메인 콘텐츠 */}
-      <Content
-        style={{
-          marginTop: 64, // 헤더의 높이와 동일하게 설정
-          padding: "24px",
-          background: colorBgContainer,
-          minHeight: "calc(100vh - 128px)", // 전체 높이에서 헤더와 푸터 제외
-        }}
-      >
-        {/* <BDSM /> */}
-        <BDSMResult />
-      </Content>
-
-      {/* 하단 푸터 */}
-      <Footer
-        style={{
-          textAlign: "center",
-        }}
-      >
-        Ant Design ©{new Date().getFullYear()} Created by Ant UED
-      </Footer>
-    </Layout>
+          <div
+            style={{
+              float: "left",
+              color: "#fff",
+              fontSize: "20px",
+              fontWeight: "bold",
+            }}
+          >
+            Redswitch
+          </div>
+        </Header>
+        <Layout>
+          <Sider
+            width={200}
+            style={{
+              background: colorBgContainer,
+            }}
+          >
+            <Menu
+              mode="inline"
+              defaultSelectedKeys={[defaultSelectedKeys]}
+              defaultOpenKeys={[defaultOpenKeys]}
+              style={{
+                height: "100%",
+                borderRight: 0,
+              }}
+              items={items}
+            />
+          </Sider>
+          <Layout
+            style={{
+              padding: "0 24px 24px",
+            }}
+          >
+            <Breadcrumb
+              style={{
+                margin: "16px 0",
+              }}
+            />
+            <Content
+              style={{
+                padding: 24,
+                margin: 0,
+                minHeight: 280,
+                background: colorBgContainer,
+                borderRadius: borderRadiusLG,
+              }}
+            >
+              {/* 페이지 라우팅 */}
+              <Routes>
+                <Route path="/bdsm/questions" element={<BDSMQuestions />} />
+                <Route path="/bdsm/results" element={<BDSMResults />} />
+                <Route path="/bdsm/advertise" element={<BDSMAdvertise />} />
+                <Route path="/bdsm/trend" element={<BDSMTrend />} />
+              </Routes>
+            </Content>
+            <Footer
+              style={{
+                textAlign: "center",
+              }}
+            >
+              Redswitch ©{new Date().getFullYear()} Created by Redswitch
+            </Footer>
+          </Layout>
+        </Layout>
+      </Layout>
+    </Router>
   );
 };
 
