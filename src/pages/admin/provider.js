@@ -16,6 +16,7 @@ import { AxiosDelete, AxiosGet, AxiosPost, AxiosPut } from "../../api";
 import { UploadOutlined } from "@ant-design/icons";
 import KakaoAddressSearch from "../../components/kakao";
 import FormItem from "antd/es/form/FormItem";
+import FileUpload from "../../components/button";
 
 const ProviderModal = ({
   visible,
@@ -30,11 +31,15 @@ const ProviderModal = ({
   useEffect(() => {
     setAddress(form.getFieldValue("provider_address"));
   }, [form.getFieldValue("provider_address")]);
+
   return (
     <Modal
       title={isEditMode ? "거래처 수정" : "거래처 추가"}
       visible={visible}
-      onCancel={onCancel}
+      onCancel={() => {
+        onCancel();
+        form.resetFields();
+      }}
       footer={null}
       centered
     >
@@ -163,15 +168,10 @@ const ProviderModal = ({
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item name="business_file" label="사업자등록증 파일">
-              <Upload
-                name="file"
-                listType="picture"
-                beforeUpload={(file) => {
-                  return false; // Prevent automatic upload
-                }}
-              >
-                <Button icon={<UploadOutlined />}>파일 업로드</Button>
-              </Upload>
+              <FileUpload
+                url={form.getFieldValue("business_file")}
+                setUrl={(url) => form.setFieldsValue({ business_file: url })}
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -254,22 +254,8 @@ const Provider = () => {
     try {
       let providerData = { ...values };
 
-      // Handle business_file separately
-      try {
-        if (values.business_file && values.business_file.fileList.length > 0) {
-          const file = values.business_file.fileList[0].originFileObj;
+      console.log(providerData);
 
-          const fileUploadResponse = await uploadFile(file);
-          const fileUrl = fileUploadResponse.data.url;
-
-          providerData.business_file = fileUrl;
-        }
-      } catch (error) {
-        // 변경이 없을 경우
-        providerData.business_file = currentProvider?.business_file;
-      }
-
-      // Handle bankbook_file separately
       try {
         if (values.bankbook_file && values.bankbook_file.fileList.length > 0) {
           const file = values.bankbook_file.fileList[0].originFileObj;
@@ -284,17 +270,12 @@ const Provider = () => {
         providerData.bankbook_file = currentProvider?.bankbook_file;
       }
 
-      console.log(providerData);
-
-      //   providerData.provider_sido = 11;
-      //   providerData.provider_sigungu = 111;
-
-      // Make the API call to create or update the provider
       if (currentProvider) {
         console.log(providerData);
         await AxiosPut(`/providers/${currentProvider.id}`, providerData, {
           headers: { "Content-Type": "application/json" },
         });
+
         setProviders(
           providers.map((provider) =>
             provider.id === currentProvider.id
@@ -307,6 +288,7 @@ const Provider = () => {
         const response = await AxiosPost("/providers", providerData, {
           headers: { "Content-Type": "application/json" },
         });
+
         setProviders((prevProviders) => [
           ...prevProviders,
           response.data.provider,
@@ -324,6 +306,8 @@ const Provider = () => {
   const uploadFile = async (file) => {
     const fileData = new FormData();
     fileData.append("file", file);
+
+    console.log(fileData);
 
     return await AxiosPost("/upload", fileData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -364,6 +348,8 @@ const Provider = () => {
     {
       title: "동작",
       key: "actions",
+      width: 100,
+      fixed: "right",
       render: (text, record) => (
         <Space>
           <a onClick={() => handleEdit(record)}>수정</a>

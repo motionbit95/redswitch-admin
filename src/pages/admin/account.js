@@ -11,8 +11,10 @@ import {
   Popconfirm,
   Row,
   Col,
+  Tag,
 } from "antd";
 import { AxiosDelete, AxiosGet, AxiosPost, AxiosPut } from "../../api";
+import { render } from "@testing-library/react";
 
 const Account = () => {
   const [accounts, setAccounts] = useState([]);
@@ -134,6 +136,17 @@ const Account = () => {
       title: "권한",
       dataIndex: "permission",
       key: "permission",
+      render(text) {
+        return text === "1" ? (
+          <Tag color="red">최고관리자</Tag>
+        ) : text === "2" ? (
+          <Tag color="blue">관리자</Tag>
+        ) : text === "3" ? (
+          <Tag color="green">거래처</Tag>
+        ) : (
+          <Tag color="orange">지점</Tag>
+        );
+      },
     },
     {
       title: "동작",
@@ -193,7 +206,7 @@ const Account = () => {
             rules={[{ required: true, message: "Permission을 선택해주세요" }]}
           >
             <Select>
-              <Select.Option value="1">Supervisor</Select.Option>
+              <Select.Option value="1">최고관리자</Select.Option>
               <Select.Option value="2">관리자</Select.Option>
               <Select.Option value="3">거래처</Select.Option>
               <Select.Option value="4">지점</Select.Option>
@@ -275,7 +288,7 @@ const Account = () => {
             rules={[{ required: true, message: "Permission을 선택해주세요" }]}
           >
             <Select>
-              <Select.Option value="1">Supervisor</Select.Option>
+              <Select.Option value="1">최고관리자</Select.Option>
               <Select.Option value="2">관리자</Select.Option>
               <Select.Option value="3">거래처</Select.Option>
               <Select.Option value="4">지점</Select.Option>
