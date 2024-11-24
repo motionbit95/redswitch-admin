@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { DotChartOutlined } from "@ant-design/icons";
+import { DotChartOutlined, UserOutlined } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import { Footer } from "antd/es/layout/layout";
 import BDSMQuestions from "./pages/bdsm/bdsm_questions";
 import BDSMResults from "./pages/bdsm/bdsm_results";
+import Account from "./pages/admin/account";
+import Provider from "./pages/admin/provider";
+import Branch from "./pages/admin/branch";
 
 const { Header, Content, Sider } = Layout;
 
@@ -47,6 +50,25 @@ const App = () => {
         {
           key: "/bdsm/trend",
           label: <Link to="/bdsm/trend">통계관리</Link>,
+        },
+      ],
+    },
+    {
+      key: "admin",
+      icon: React.createElement(UserOutlined),
+      label: "관리자 설정",
+      children: [
+        {
+          key: "/admin/account",
+          label: <Link to="/admin/account">계정관리</Link>,
+        },
+        {
+          key: "/admin/provider",
+          label: <Link to="/admin/provider">거래처관리</Link>,
+        },
+        {
+          key: "/admin/branch",
+          label: <Link to="/admin/branch">지점관리</Link>,
         },
       ],
     },
@@ -111,6 +133,10 @@ const App = () => {
             >
               {/* 페이지 라우팅 */}
               <Routes>
+                <Route path="/admin/account" element={<Account />} />
+                <Route path="/admin/provider" element={<Provider />} />
+                <Route path="/admin/branch" element={<Branch />} />
+
                 <Route path="/bdsm/questions" element={<BDSMQuestions />} />
                 <Route path="/bdsm/results" element={<BDSMResults />} />
                 <Route path="/bdsm/advertise" element={<BDSMAdvertise />} />
