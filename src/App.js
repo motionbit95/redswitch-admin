@@ -23,13 +23,12 @@ import Product from "./pages/product/product";
 import Inventory from "./pages/product/inventory";
 import Purchase_order from "./pages/product/purchase_order";
 import Order from "./pages/order/order";
+import BDSMStatistics from "./pages/bdsm/bdsm_statistics";
 
 const { Header, Content, Sider } = Layout;
 
 // 각 페이지 컴포넌트
 const BDSMAdvertise = () => <div>광고 관리 페이지</div>;
-const BDSMTrend = () => <div>통계 관리 페이지</div>;
-
 const App = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -228,7 +227,7 @@ const App = () => {
                 <Route path="/bdsm/questions" element={<BDSMQuestions />} />
                 <Route path="/bdsm/results" element={<BDSMResults />} />
                 <Route path="/bdsm/advertise" element={<BDSMAdvertise />} />
-                <Route path="/bdsm/trend" element={<BDSMTrend />} />
+                <Route path="/bdsm/trend" element={<BDSMStatistics />} />
 
                 <Route path="/product/product" element={<Product />} />
                 <Route path="/product/inventory" element={<Inventory />} />
