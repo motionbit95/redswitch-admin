@@ -12,6 +12,7 @@ import {
   Row,
   Col,
   Tag,
+  Cascader,
 } from "antd";
 import { AxiosDelete, AxiosGet, AxiosPost, AxiosPut } from "../../api";
 import { render } from "@testing-library/react";
@@ -23,22 +24,23 @@ const Account = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [currentAccount, setCurrentAccount] = useState(null); // For edit
   const [form] = Form.useForm();
+  const [branchs, setBranchs] = useState([]);
 
   // Fetch account data
   useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const response = await AxiosGet("/accounts"); // Replace with your endpoint
-        setAccounts(response.data);
-      } catch (error) {
-        message.error("계정 데이터를 가져오는 데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAccounts();
   }, []);
+
+  const fetchAccounts = async () => {
+    try {
+      const response = await AxiosGet("/accounts"); // Replace with your endpoint
+      setAccounts(response.data);
+    } catch (error) {
+      message.error("계정 데이터를 가져오는 데 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Delete account
   const handleDelete = async (id) => {
@@ -46,6 +48,7 @@ const Account = () => {
       await AxiosDelete(`/accounts/${id}`); // Replace with your endpoint
       setAccounts(accounts.filter((account) => account.id !== id));
       message.success("계정 삭제 성공");
+      fetchAccounts();
     } catch (error) {
       message.error("계정 삭제 실패");
     }
@@ -69,6 +72,7 @@ const Account = () => {
       );
       setIsEditModalVisible(false);
       message.success("계정 수정 성공");
+      fetchAccounts();
     } catch (error) {
       message.error("계정 수정 실패");
     }
@@ -100,6 +104,7 @@ const Account = () => {
 
       // 성공 메시지
       message.success("계정 생성 성공");
+      fetchAccounts();
     } catch (error) {
       message.error("계정 생성 실패");
     }
@@ -165,6 +170,8 @@ const Account = () => {
       ),
     },
   ];
+
+  // 지점 선택
 
   return (
     <div style={{ textAlign: "right" }}>
@@ -342,6 +349,23 @@ const Account = () => {
             <Input />
           </Form.Item>
 
+          <Form.Item name="branch_id" label="담당 지점">
+            <Row gutter={16}>
+              <Col span={18}>
+                <Cascader options={options} multiple />
+              </Col>
+              <Col span={6}>
+                <Button
+                  style={{ width: "100%" }}
+                  type="primary"
+                  onClick={() => alert("지점 선택")}
+                >
+                  지점 불러오기
+                </Button>
+              </Col>
+            </Row>
+          </Form.Item>
+
           <Form.Item name="office_position" label="직급">
             <Input />
           </Form.Item>
@@ -360,3 +384,60 @@ const Account = () => {
 };
 
 export default Account;
+
+const options = [
+  {
+    label: "City1",
+    value: "city1",
+    children: [
+      {
+        label: "dong1",
+        value: "dong1",
+        children: [
+          {
+            label: "Branch1",
+            value: "branch1",
+          },
+          {
+            label: "Branch2",
+            value: "branch2",
+          },
+        ],
+      },
+      {
+        label: "dong2",
+        value: "dong2",
+        children: [
+          {
+            label: "Branch3",
+            value: "branch3",
+          },
+          {
+            label: "Branch4",
+            value: "branch4",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: "City2",
+    value: "city2",
+    children: [
+      {
+        label: "dong3",
+        value: "dong3",
+        children: [
+          {
+            label: "Branch5",
+            value: "branch5",
+          },
+          {
+            label: "Branch6",
+            value: "branch6",
+          },
+        ],
+      },
+    ],
+  },
+];

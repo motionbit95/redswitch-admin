@@ -186,6 +186,7 @@ const BranchModal = ({
 function Branch(props) {
   const [loading, setLoading] = useState(true);
   const [branchs, setBranchs] = useState([]);
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentBranch, setCurrentBranch] = useState(null);
   const [form] = Form.useForm();
