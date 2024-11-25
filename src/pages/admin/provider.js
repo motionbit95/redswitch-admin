@@ -49,13 +49,28 @@ const ProviderModal = ({
         initialValues={initialValues}
         onFinish={onSubmit}
       >
-        <Form.Item
-          name="provider_name"
-          label="거래처명"
-          rules={[{ required: true, message: "거래처명을 입력해주세요" }]}
-        >
-          <Input />
-        </Form.Item>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="provider_name"
+              label="거래처명"
+              rules={[{ required: true, message: "거래처명을 입력해주세요" }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="provider_code"
+              label="거래처 코드"
+              rules={[
+                { required: true, message: "거래처 코드을 입력해주세요" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Row gutter={16} style={{ display: "none" }}>
           <Col span={12}>
@@ -210,19 +225,18 @@ const Provider = () => {
 
   // Fetch provider data
   useEffect(() => {
-    const fetchProviders = async () => {
-      try {
-        const response = await AxiosGet("/providers"); // Replace with your endpoint
-        setProviders(response.data);
-      } catch (error) {
-        message.error("거래처 데이터를 가져오는 데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProviders();
   }, []);
+  const fetchProviders = async () => {
+    try {
+      const response = await AxiosGet("/providers"); // Replace with your endpoint
+      setProviders(response.data);
+    } catch (error) {
+      message.error("거래처 데이터를 가져오는 데 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Delete provider
   const handleDelete = async (id) => {
@@ -284,6 +298,7 @@ const Provider = () => {
           )
         );
         message.success("거래처 수정 성공");
+        fetchProviders();
       } else {
         const response = await AxiosPost("/providers", providerData, {
           headers: { "Content-Type": "application/json" },
@@ -294,6 +309,7 @@ const Provider = () => {
           response.data.provider,
         ]);
         message.success("거래처 생성 성공");
+        fetchProviders();
       }
 
       setIsModalVisible(false);
