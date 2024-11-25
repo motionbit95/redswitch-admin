@@ -143,13 +143,13 @@ const Account = () => {
       key: "permission",
       render(text) {
         return text === "1" ? (
-          <Tag color="red">최고관리자</Tag>
+          <Tag color="red">본사관리자</Tag>
         ) : text === "2" ? (
-          <Tag color="blue">관리자</Tag>
+          <Tag color="blue">지사관리자</Tag>
         ) : text === "3" ? (
-          <Tag color="green">거래처</Tag>
+          <Tag color="green">지점관리자</Tag>
         ) : (
-          <Tag color="orange">지점</Tag>
+          <Tag color="orange">거래처</Tag>
         );
       },
     },
@@ -213,10 +213,10 @@ const Account = () => {
             rules={[{ required: true, message: "Permission을 선택해주세요" }]}
           >
             <Select>
-              <Select.Option value="1">최고관리자</Select.Option>
-              <Select.Option value="2">관리자</Select.Option>
-              <Select.Option value="3">거래처</Select.Option>
-              <Select.Option value="4">지점</Select.Option>
+              <Select.Option value="1">본사관리자</Select.Option>
+              <Select.Option value="2">지사관리자</Select.Option>
+              <Select.Option value="3">지점관리자</Select.Option>
+              {/* <Select.Option value="4">거래처</Select.Option> */}
             </Select>
           </Form.Item>
           <Row gutter={16}>
@@ -295,10 +295,10 @@ const Account = () => {
             rules={[{ required: true, message: "Permission을 선택해주세요" }]}
           >
             <Select>
-              <Select.Option value="1">최고관리자</Select.Option>
-              <Select.Option value="2">관리자</Select.Option>
-              <Select.Option value="3">거래처</Select.Option>
-              <Select.Option value="4">지점</Select.Option>
+              <Select.Option value="1">본사관리자</Select.Option>
+              <Select.Option value="2">지사관리자</Select.Option>
+              <Select.Option value="3">지점관리자</Select.Option>
+              {/* <Select.Option value="4">거래처</Select.Option> */}
             </Select>
           </Form.Item>
           <Row gutter={16}>
