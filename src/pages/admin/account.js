@@ -15,7 +15,8 @@ import {
   Cascader,
 } from "antd";
 import { AxiosDelete, AxiosGet, AxiosPost, AxiosPut } from "../../api";
-import { render } from "@testing-library/react";
+import Searchprovider from "../../components/searchprovider";
+import SearchBranch from "../../components/searchbranch";
 
 const Account = () => {
   const [accounts, setAccounts] = useState([]);
@@ -275,6 +276,26 @@ const Account = () => {
             rules={[{ required: true, message: "이메일을 입력해주세요" }]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item label="거래처 선택">
+            <Row gutter={16} justify={"space-between"}>
+              <Col span={16}>
+                <Input />
+              </Col>
+              <Col>
+                <Searchprovider />
+              </Col>
+            </Row>
+          </Form.Item>
+          <Form.Item label="지점 선택">
+            <Row gutter={16} justify={"space-between"}>
+              <Col span={16}>
+                <Input />
+              </Col>
+              <Col>
+                <SearchBranch />
+              </Col>
+            </Row>
           </Form.Item>
 
           <Form.Item name="office_position" label="직급">

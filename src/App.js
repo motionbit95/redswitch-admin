@@ -86,7 +86,7 @@ const App = () => {
       children: [
         {
           key: "/product/material",
-          label: <Link to="/product/material">물자관리</Link>,
+          label: <Link to="/product/material">상품추가</Link>,
         },
         {
           key: "/product/product",

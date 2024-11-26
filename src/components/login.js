@@ -12,10 +12,9 @@ import {
   message,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "antd/es/form/Form";
 import { AxiosPost } from "../api";
 const LoginForm = ({ setIsLoggedIn }) => {
-  const [form] = useForm();
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const {
     token: { colorBgContainer, borderRadiusLG },
