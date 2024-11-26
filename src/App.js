@@ -13,7 +13,7 @@ import { Footer } from "antd/es/layout/layout";
 import BDSMQuestions from "./pages/bdsm/bdsm_questions";
 import BDSMResults from "./pages/bdsm/bdsm_results";
 import Account from "./pages/admin/account";
-import Provider from "./pages/admin/provider";
+import Provider from "./pages/provider/provider";
 import Branch from "./pages/admin/branch";
 import Main from "./pages/admin/main";
 import Post from "./pages/post/post";
@@ -24,6 +24,9 @@ import Inventory from "./pages/product/inventory";
 import Purchase_order from "./pages/product/purchase_order";
 import Order from "./pages/order/order";
 import BDSMStatistics from "./pages/bdsm/bdsm_statistics";
+import Material from "./pages/product/material";
+import Salse from "./pages/sales/salse";
+import Settlement from "./pages/sales/settlement";
 
 const { Header, Content, Sider } = Layout;
 
@@ -44,6 +47,10 @@ const App = () => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
   // 메뉴 항목
   const items = [
     {
@@ -54,6 +61,10 @@ const App = () => {
         {
           key: "/sales/sales",
           label: <Link to="/sales/sales">매출관리</Link>,
+        },
+        {
+          key: "/sales/settlement",
+          label: <Link to="/sales/settlement">정산관리</Link>,
         },
       ],
     },
@@ -73,6 +84,10 @@ const App = () => {
       icon: React.createElement(InboxOutlined),
       label: "상품관리",
       children: [
+        {
+          key: "/product/material",
+          label: <Link to="/product/material">물자관리</Link>,
+        },
         {
           key: "/product/product",
           label: <Link to="/product/product">상품관리</Link>,
@@ -99,6 +114,17 @@ const App = () => {
         {
           key: "/post/franchise",
           label: <Link to="/post/franchise">가맹점 게시판</Link>,
+        },
+      ],
+    },
+    {
+      key: "provider",
+      icon: React.createElement(ReadOutlined),
+      label: "가맹점관리",
+      children: [
+        {
+          key: "/provider/provider",
+          label: <Link to="/provider/provider">가맹점관리</Link>,
         },
       ],
     },
@@ -135,10 +161,6 @@ const App = () => {
           label: <Link to="/admin/account">계정관리</Link>,
         },
         {
-          key: "/admin/provider",
-          label: <Link to="/admin/provider">거래처관리</Link>,
-        },
-        {
           key: "/admin/branch",
           label: <Link to="/admin/branch">지점관리</Link>,
         },
@@ -172,10 +194,10 @@ const App = () => {
           <Space>
             {isLoggedIn ? (
               <Space>
-                <Button onClick={() => {}}>Logout</Button>
+                <Button onClick={handleLogout}>Logout</Button>
               </Space>
             ) : (
-              <LoginForm />
+              <LoginForm setIsLoggedIn={setIsLoggedIn} />
             )}
             {/* <Switch checked={isDarkMode} onChange={toggleTheme} /> */}
           </Space>
@@ -221,14 +243,16 @@ const App = () => {
               <Routes>
                 <Route path="/admin" element={<Main />} />
                 <Route path="/admin/account" element={<Account />} />
-                <Route path="/admin/provider" element={<Provider />} />
                 <Route path="/admin/branch" element={<Branch />} />
+
+                <Route path="/provider/provider" element={<Provider />} />
 
                 <Route path="/bdsm/questions" element={<BDSMQuestions />} />
                 <Route path="/bdsm/results" element={<BDSMResults />} />
                 <Route path="/bdsm/advertise" element={<BDSMAdvertise />} />
                 <Route path="/bdsm/trend" element={<BDSMStatistics />} />
 
+                <Route path="/product/material" element={<Material />} />
                 <Route path="/product/product" element={<Product />} />
                 <Route path="/product/inventory" element={<Inventory />} />
                 <Route
@@ -240,6 +264,9 @@ const App = () => {
 
                 <Route path="/post/post" element={<Post />} />
                 <Route path="/post/franchise" element={<FranchisePost />} />
+
+                <Route path="/sales/sales" element={<Salse />} />
+                <Route path="/sales/settlement" element={<Settlement />} />
               </Routes>
             </Content>
             <Footer

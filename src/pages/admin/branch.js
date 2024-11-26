@@ -1,5 +1,6 @@
 import {
   Button,
+  Checkbox,
   Col,
   Form,
   Input,
@@ -8,6 +9,7 @@ import {
   Row,
   Space,
   Table,
+  Tag,
   Upload,
   message,
 } from "antd";
@@ -49,13 +51,23 @@ const BranchModal = ({
         initialValues={initialValues}
         onFinish={onSubmit}
       >
-        <Form.Item
-          name="branch_name"
-          label="지점명"
-          rules={[{ required: true, message: "지점명을 입력해주세요" }]}
-        >
-          <Input />
-        </Form.Item>
+        <Row gutter={16}>
+          <Col span={20}>
+            <Form.Item
+              name="branch_name"
+              label="지점명"
+              rules={[{ required: true, message: "지점명을 입력해주세요" }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={4}>
+            <Form.Item name="install_flag" label="설치여부">
+              <Input />
+              {/* <Checkbox /> */}
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Row gutter={16} style={{ display: "none" }}>
           <Col span={12}>
@@ -161,11 +173,27 @@ const BranchModal = ({
         </Row>
 
         <Row gutter={16}>
-          <Col span={12}>
+          <Col span={8}>
             <Form.Item name="contract_image" label="계약서 파일">
               <FileUpload
                 url={form.getFieldValue("contract_image")}
                 setUrl={(url) => form.setFieldsValue({ contract_image: url })}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name="branch_image" label="지점 이미지">
+              <FileUpload
+                url={form.getFieldValue("branch_image")}
+                setUrl={(url) => form.setFieldsValue({ branch_image: url })}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name="install_image" label="NFC 설치 이미지">
+              <FileUpload
+                url={form.getFieldValue("install_image")}
+                setUrl={(url) => form.setFieldsValue({ install_image: url })}
               />
             </Form.Item>
           </Col>
@@ -220,6 +248,7 @@ function Branch(props) {
 
   // Edit branch - Open modal
   const handleEdit = (branch) => {
+    console.log(branch);
     setCurrentBranch(branch);
     form.setFieldsValue(branch); // Set the form fields to current branch values
     setIsModalVisible(true);
@@ -306,17 +335,17 @@ function Branch(props) {
       key: "branch_name",
     },
     {
+      title: "객실 수",
+      dataIndex: "branch_room_cnt",
+      key: "branch_room_cnt",
+    },
+    {
       title: "주소",
       dataIndex: "branch_address",
       key: "branch_address",
     },
     {
-      title: "전화번호",
-      dataIndex: "branch_contact",
-      key: "branch_contact",
-    },
-    {
-      title: "대표자명",
+      title: "대표자",
       dataIndex: "branch_ceo_name",
       key: "branch_ceo_name",
     },
@@ -324,6 +353,29 @@ function Branch(props) {
       title: "담당자명",
       dataIndex: "branch_manager_name",
       key: "branch_manager_name",
+    },
+    {
+      title: "담당자 전화번호",
+      dataIndex: "branch_manager_phone",
+      key: "branch_manager_phone",
+    },
+    {
+      title: "사업자번호",
+      dataIndex: "branch_brn",
+      key: "branch_brn",
+    },
+    {
+      title: "설치 여부",
+      dataIndex: "install_flag",
+      key: "install_flag",
+
+      render: (text) => {
+        return (
+          <Tag color={text === 0 ? "red" : "green"}>
+            {text === 0 ? "미설치" : "설치"}
+          </Tag>
+        );
+      },
     },
     {
       title: "동작",

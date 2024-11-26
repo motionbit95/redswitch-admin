@@ -128,6 +128,11 @@ const Account = () => {
       key: "user_name",
     },
     {
+      title: "직급",
+      dataIndex: "office_position",
+      key: "office_position",
+    },
+    {
       title: "이메일",
       dataIndex: "user_email",
       key: "user_email",
@@ -136,6 +141,11 @@ const Account = () => {
       title: "전화번호",
       dataIndex: "user_phone",
       key: "user_phone",
+    },
+    {
+      title: "관리지점",
+      // dataIndex: "branch_name",
+      // key: "branch_name",
     },
     {
       title: "권한",

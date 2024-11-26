@@ -337,14 +337,14 @@ const Provider = () => {
       key: "provider_name",
     },
     {
-      title: "주소",
-      dataIndex: "provider_address",
-      key: "provider_address",
+      title: "담당자명",
+      dataIndex: "provider_manager_name",
+      key: "provider_manager_name",
     },
     {
-      title: "전화번호",
-      dataIndex: "provider_contact",
-      key: "provider_contact",
+      title: "담당자 전화번호",
+      dataIndex: "provider_manager_phone",
+      key: "provider_manager_phone",
     },
     {
       title: "사업자등록번호",
@@ -352,14 +352,14 @@ const Provider = () => {
       key: "provider_brn",
     },
     {
-      title: "대표자명",
-      dataIndex: "provider_ceo_name",
-      key: "provider_ceo_name",
+      title: "관리자명",
+      dataIndex: "user_name",
+      key: "user_name",
     },
     {
-      title: "담당자명",
-      dataIndex: "provider_manager_name",
-      key: "provider_manager_name",
+      title: "관리자 전화번호",
+      dataIndex: "user_phone",
+      key: "user_phone",
     },
     {
       title: "동작",

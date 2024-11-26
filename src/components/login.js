@@ -1,9 +1,20 @@
 import React, { useState } from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Flex, Row, Col, Modal, theme } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Flex,
+  Row,
+  Col,
+  Modal,
+  theme,
+  message,
+} from "antd";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
-const LoginForm = () => {
+import { AxiosPost } from "../api";
+const LoginForm = ({ setIsLoggedIn }) => {
   const [form] = useForm();
   const navigate = useNavigate();
   const {
@@ -12,15 +23,47 @@ const LoginForm = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     console.log("Received values of form: ", values);
+
+    try {
+      const response = await AxiosPost("/accounts/login", {
+        user_id: values.user_id,
+        user_password: values.password,
+      });
+      if (response.status === 200) {
+        message.success("로그인 성공");
+        setIsLoggedIn(true);
+        setModalOpen(false);
+        navigate("/admin");
+      } else if (response.status === 404) {
+        message.error(response.data.message);
+      }
+    } catch (error) {
+      message.error("로그인 실패");
+    }
   };
 
   return (
     <>
-      <Button onClick={() => setModalOpen(true)}>Login</Button>
+      <Button type="primary" onClick={() => setModalOpen(true)}>
+        Login
+      </Button>
       <Modal
-        title="Login"
+        title={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              fontSize: 44,
+              fontFamily: "revert",
+              padding: "0 0 20px 0",
+            }}
+          >
+            Login
+          </div>
+        }
         width={440}
         open={modalOpen}
         centered
@@ -33,6 +76,8 @@ const LoginForm = () => {
           name="login"
           style={{
             minWidth: 300,
+            minHeight: 270,
+            alignContent: "center",
           }}
           onFinish={onFinish}
         >
