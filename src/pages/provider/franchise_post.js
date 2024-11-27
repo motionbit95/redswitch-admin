@@ -125,6 +125,7 @@ const FranchisePost = () => {
     <>
       <Table
         size="small"
+        style={{ marginTop: 48 }}
         columns={columns}
         dataSource={dummyData}
         loading={loading}
