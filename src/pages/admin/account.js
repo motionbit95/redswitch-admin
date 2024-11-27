@@ -15,8 +15,8 @@ import {
   Cascader,
 } from "antd";
 import { AxiosDelete, AxiosGet, AxiosPost, AxiosPut } from "../../api";
-import Searchprovider from "../../components/searchprovider";
-import SearchBranch from "../../components/searchbranch";
+import SelectBranch from "../../components/selectbranch";
+import SelectProvider from "../../components/selectprovider";
 
 const Account = () => {
   const [accounts, setAccounts] = useState([]);
@@ -25,7 +25,9 @@ const Account = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [currentAccount, setCurrentAccount] = useState(null); // For edit
   const [form] = Form.useForm();
-  const [branchs, setBranchs] = useState([]);
+
+  const [selectedBranch, setSelectedBranch] = useState([]);
+  const [selectedProvider, setSelectedProvider] = useState([]);
 
   // Fetch account data
   useEffect(() => {
@@ -64,8 +66,15 @@ const Account = () => {
 
   // Handle form submit for account update
   const handleUpdate = async (values) => {
+    const provider_id = selectedProvider.map((provider) => provider.id);
+    const branch_id = selectedBranch.map((branch) => branch.id);
+    console.log(provider_id, branch_id);
     try {
-      await AxiosPut(`/accounts/${currentAccount.id}`, values); // Replace with your endpoint
+      await AxiosPut(`/accounts/${currentAccount.id}`, {
+        provider_id: provider_id,
+        branch_id: branch_id,
+        ...values,
+      }); // Replace with your endpoint
       setAccounts(
         accounts.map((account) =>
           account.id === currentAccount.id ? { ...account, ...values } : account
@@ -88,9 +97,16 @@ const Account = () => {
 
   // Handle form submit for account creation
   const handleAdd = async (values) => {
+    console.log(values.provider_id);
+    const provider_id = selectedProvider.map((provider) => provider.id);
+    const branch_id = selectedBranch.map((branch) => branch.id);
     try {
       // 서버로부터 데이터 추가 후 응답 받기
-      const response = await AxiosPost("/accounts", values); // Replace with your endpoint
+      const response = await AxiosPost("/accounts", {
+        provider_id: provider_id,
+        branch_id: branch_id,
+        ...values,
+      }); // Replace with your endpoint
 
       let newAccount = response.data.account;
       console.log(newAccount);
@@ -144,11 +160,6 @@ const Account = () => {
       key: "user_phone",
     },
     {
-      title: "관리지점",
-      // dataIndex: "branch_name",
-      // key: "branch_name",
-    },
-    {
       title: "권한",
       dataIndex: "permission",
       key: "permission",
@@ -170,7 +181,14 @@ const Account = () => {
 
       render: (text, record) => (
         <Space>
-          <a onClick={() => handleEdit(record)}>수정</a>
+          <a
+            onClick={() => {
+              console.log(record);
+              handleEdit(record);
+            }}
+          >
+            수정
+          </a>
           <Popconfirm
             title="계정을 삭제하시겠습니까?"
             onConfirm={() => handleDelete(record.id)}
@@ -181,8 +199,21 @@ const Account = () => {
       ),
     },
   ];
+  const handleCloseBranch = (removedName) => {
+    const updatedBranches = selectedBranch.filter(
+      (branch) => branch.branch_name !== removedName
+    );
+    setSelectedBranch(updatedBranches);
+    console.log(updatedBranches);
+  };
 
-  // 지점 선택
+  const handleCloseProvider = (removedName) => {
+    const updatedProvider = selectedProvider.filter(
+      (provider) => provider.provider_name !== removedName
+    );
+    setSelectedProvider(updatedProvider);
+    console.log(updatedProvider);
+  };
 
   return (
     <div style={{ textAlign: "right" }}>
@@ -208,7 +239,10 @@ const Account = () => {
         title="계정 수정"
         open={isEditModalVisible}
         // visible={isEditModalVisible}
-        onCancel={() => setIsEditModalVisible(false)}
+        onCancel={() => {
+          setIsEditModalVisible(false);
+          form.resetFields();
+        }}
         footer={null}
         centered
       >
@@ -277,25 +311,43 @@ const Account = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item label="거래처 선택">
-            <Row gutter={16} justify={"space-between"}>
-              <Col span={16}>
-                <Input />
-              </Col>
-              <Col>
-                <Searchprovider />
-              </Col>
-            </Row>
+
+          <Form.Item name="branch_id" label="지점 선택">
+            {selectedBranch.map((branch, index) => (
+              <Tag
+                key={branch.id}
+                color={
+                  index % 3 === 0 ? "red" : index % 3 === 1 ? "blue" : "green"
+                }
+                closable
+                onClose={() => handleCloseBranch(branch.branch_name)}
+              >
+                {branch.branch_name}
+              </Tag>
+            ))}
+            <SelectBranch
+              selectedBranch={selectedBranch}
+              setSelectedBranch={setSelectedBranch}
+            />
           </Form.Item>
-          <Form.Item label="지점 선택">
-            <Row gutter={16} justify={"space-between"}>
-              <Col span={16}>
-                <Input />
-              </Col>
-              <Col>
-                <SearchBranch />
-              </Col>
-            </Row>
+
+          <Form.Item name="provider_id" label="거래처 선택">
+            {selectedProvider.map((provider, index) => (
+              <Tag
+                key={provider.provider_name}
+                color={
+                  index % 3 === 0 ? "red" : index % 3 === 1 ? "blue" : "green"
+                }
+                closable
+                onClose={() => handleCloseProvider(provider.provider_name)}
+              >
+                {provider.provider_name}
+              </Tag>
+            ))}
+            <SelectProvider
+              selectedProvider={selectedProvider}
+              setSelectedProvider={setSelectedProvider}
+            />
           </Form.Item>
 
           <Form.Item name="office_position" label="직급">
@@ -316,6 +368,7 @@ const Account = () => {
       <Modal
         title="계정 추가"
         visible={isAddModalVisible}
+        centered
         onCancel={() => setIsAddModalVisible(false)}
         footer={null}
       >
@@ -380,21 +433,42 @@ const Account = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item name="branch_id" label="담당 지점">
-            <Row gutter={16}>
-              <Col span={18}>
-                <Cascader options={options} multiple />
-              </Col>
-              <Col span={6}>
-                <Button
-                  style={{ width: "100%" }}
-                  type="primary"
-                  onClick={() => alert("지점 선택")}
-                >
-                  지점 불러오기
-                </Button>
-              </Col>
-            </Row>
+          <Form.Item name="branch_id" label="지점 선택">
+            {selectedBranch.map((branch, index) => (
+              <Tag
+                key={branch.branch_name}
+                color={
+                  index % 3 === 0 ? "red" : index % 3 === 1 ? "blue" : "green"
+                }
+                closable
+                onClose={() => handleCloseBranch(branch.branch_name)}
+              >
+                {branch.branch_name}
+              </Tag>
+            ))}
+            <SelectBranch
+              selectedBranch={selectedBranch}
+              setSelectedBranch={setSelectedBranch}
+            />
+          </Form.Item>
+
+          <Form.Item name="provider_id" label="거래처 선택">
+            {selectedProvider.map((provider, index) => (
+              <Tag
+                key={provider.provider_name}
+                color={
+                  index % 3 === 0 ? "red" : index % 3 === 1 ? "blue" : "green"
+                }
+                closable
+                onClose={() => handleCloseProvider(provider.provider_name)}
+              >
+                {provider.provider_name}
+              </Tag>
+            ))}
+            <SelectProvider
+              selectedProvider={selectedProvider}
+              setSelectedProvider={setSelectedProvider}
+            />
           </Form.Item>
 
           <Form.Item name="office_position" label="직급">
