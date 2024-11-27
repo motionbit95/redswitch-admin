@@ -14,8 +14,8 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import Searchprovider from "../../components/searchprovider";
-import Addproduct from "../../components/product/product_add";
-import ProductCategory from "../../components/product/product_category";
+import Addproduct from "../../components/material/product_add";
+import ProductCategory from "../../components/material/product_category";
 import { AxiosDelete, AxiosGet } from "../../api";
 
 const Material = () => {
@@ -25,15 +25,19 @@ const Material = () => {
     provider: "",
   });
   const [materialList, setMaterialList] = useState([]);
-  const [list, setList] = useState([]);
   const [isSelected, setIsSelected] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState(null);
 
-  const handleSearchMaterials = async (id) => {
-    console.log(selectedProvider.provider_name, id);
+  const handleSearchMaterials = async () => {
+    console.log(">>>>>>", selectedProvider.provider_name);
     try {
-      const response = await AxiosGet(`/products/materials/${id}`);
+      const response = await AxiosGet("/products/materials");
       setMaterialList(response.data);
+      // response.data.map((item) => ({ key: item.provider_name, ...item }))
+      console.log(
+        "회사 물자 리스트",
+        response.data.map((item) => ({ key: item.provider_name, ...item }))
+      );
     } catch (error) {
       message.error("실패");
     }
@@ -94,15 +98,20 @@ const Material = () => {
       <Space style={{ width: "100%", justifyContent: "space-between" }}>
         <Space>
           <Searchprovider
-            handleSearch={handleSearchMaterials}
-            selectedProvider={selectedProvider}
             setSelectedProvider={setSelectedProvider}
-            isSelectedProvider={isSelected}
             setisSelectedProvider={setIsSelected}
           />
+          {isSelected && (
+            <>
+              <div>{selectedProvider?.provider_name}</div>
+              <Button type="primary" onClick={handleSearchMaterials}>
+                검색
+              </Button>
+            </>
+          )}
         </Space>
         <Space>
-          <ProductCategory isSelected={isSelected} />
+          <ProductCategory />
           <Addproduct
             isSelected={isSelected}
             selectedProvider={selectedProvider}

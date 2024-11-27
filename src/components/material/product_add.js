@@ -16,7 +16,7 @@ const Addproduct = ({ selectedProvider, isSelected }) => {
   }, [selectedProvider]);
 
   const handleAddProduct = async (values) => {
-    console.log("Success:", values);
+    // console.log("Success:", values, selectedProvider);
     try {
       const response = await AxiosPost("/products/materials", {
         ...values,
@@ -29,6 +29,7 @@ const Addproduct = ({ selectedProvider, isSelected }) => {
       });
       if (response.status === 201) {
         message.success("상품 추가 성공");
+        console.log(response.data);
         setIsModalOpen(false);
         form.resetFields();
       } else {
@@ -48,7 +49,7 @@ const Addproduct = ({ selectedProvider, isSelected }) => {
       message.error("실패");
     } finally {
       setLoading(false);
-      console.log(categories);
+      // console.log(categories);
     }
   };
 

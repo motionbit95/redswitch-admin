@@ -18,9 +18,7 @@ import { AxiosGet } from "../api";
 const Searchprovider = ({
   selectedProvider,
   setSelectedProvider,
-  isSelectedProvider,
   setisSelectedProvider,
-  handleSearch,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
@@ -30,7 +28,6 @@ const Searchprovider = ({
 
   useEffect(() => {
     fetchProviders();
-    console.log(providers);
   }, []);
 
   const fetchProviders = async () => {
@@ -45,20 +42,21 @@ const Searchprovider = ({
     }
   };
 
-  const handleOK = async (name) => {
-    try {
-      const provider = providers.find((item) => item.provider_name === name);
-      if (!provider) {
-        message.error("거래처가 잘못 선택되었습니다.");
-        return;
-      }
-      setSelectedProvider(provider);
-      setisSelectedProvider(true);
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("Error in handleOK:", error.message);
-      message.error(error.message || "선택 처리 중 오류가 발생했습니다.");
+  const handleOK = () => {
+    if (!selectedRowKeys.length) {
+      message.warning("거래처를 선택해주세요.");
+      return;
     }
+
+    const provider = providers.find((item) => item.key === selectedRowKeys[0]);
+    if (!provider) {
+      message.error("잘못된 거래처가 선택되었습니다.");
+      return;
+    }
+
+    setSelectedProvider(provider);
+    setisSelectedProvider(true);
+    setIsModalOpen(false);
   };
 
   const columns = [
@@ -82,37 +80,25 @@ const Searchprovider = ({
       dataIndex: "provider_manager_phone",
       key: "provider_manager_phone",
     },
-    {
-      title: "동작",
-      key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <Popconfirm
-            title="거래처을 선택하시겠습니까?"
-            onConfirm={() => handleOK(record.provider_name)}
-          >
-            <Button size="small" type="primary">
-              선택
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
   ];
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+    setSelectedProvider(providers.find((c) => c.key === newSelectedRowKeys[0]));
+  };
+
+  const rowSelection = {
+    type: "radio",
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  const hasSelected = selectedRowKeys.length > 0;
 
   return (
     <>
-      <Space size="middle">
-        <Button onClick={() => setIsModalOpen(true)}>거래처 선택</Button>
-        {isSelectedProvider && (
-          <>
-            <div>{selectedProvider?.provider_name}</div>
-            <Button type="primary" onClick={handleSearch}>
-              검색
-            </Button>
-          </>
-        )}
-      </Space>
+      <Button onClick={() => setIsModalOpen(true)}>거래처 선택</Button>
 
       <Modal
         title="거래처 검색"
@@ -123,12 +109,19 @@ const Searchprovider = ({
           <Button key="back" onClick={() => setIsModalOpen(false)}>
             닫기
           </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={() => handleOK(selectedRowKeys[0])}
+          >
+            선택
+          </Button>,
         ]}
       >
         <SearchForm />
         <Table
           size="small"
-          rowKey="id"
+          rowSelection={rowSelection}
           columns={columns}
           dataSource={providers}
           loading={loading}
